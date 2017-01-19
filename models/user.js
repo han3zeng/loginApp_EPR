@@ -18,9 +18,11 @@ var UserSchema = mongoose.Schema({
 	}
 });
 
+// http://mongoosejs.com/docs/models.html
 var User = module.exports = mongoose.model('User', UserSchema);
 
 module.exports.createUser = function(newUser, callback){
+	// https://www.npmjs.com/package/bcrypt
 	bcrypt.genSalt(10, function(err, salt) {
 	    bcrypt.hash(newUser.password, salt, function(err, hash) {
 	        newUser.password = hash;
@@ -29,6 +31,7 @@ module.exports.createUser = function(newUser, callback){
 	});
 }
 
+// findOne, findById all are mongoose method 
 module.exports.getUserByUsername = function(username, callback){
 	var query = {username: username};
 	User.findOne(query, callback);
@@ -39,6 +42,7 @@ module.exports.getUserById = function(id, callback){
 }
 
 module.exports.comparePassword = function(candidatePassword, hash, callback){
+	// https://www.npmjs.com/package/bcryptjs
 	bcrypt.compare(candidatePassword, hash, function(err, isMatch) {
     	if(err) throw err;
     	callback(null, isMatch);
