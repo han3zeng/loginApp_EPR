@@ -8,7 +8,10 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Brad Traversy",
-  "license": "ISC",
+  "license": "ISC","repository": {
+    "type" : "git",
+    "url" : "https://github.com/hanyulo/loginApp_EPM.git"
+  },
   "dependencies": {
     "bcryptjs": "*",
     "body-parser": "*",
@@ -23,6 +26,7 @@
     "mongoose": "*",
     "passport": "*",
     "passport-http": "*",
-    "passport-local": "*"
+    "passport-local": "*",
+    "redis": "^2.6.5"
   }
 }

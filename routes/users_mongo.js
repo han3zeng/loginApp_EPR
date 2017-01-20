@@ -4,10 +4,10 @@ var router = express.Router();
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 
-var userHandler = require('../models/UserHandler')
-var User = require('../models/User')
+// mongoose, used for create a user document of users collection
+var User = require('../models/user');
 
-// Register  // cilck register and go to register page
+// Register  // cilck register and go to regiter page
 router.get('/register', function(req, res){
 	res.render('register');
 });
@@ -47,10 +47,16 @@ router.post('/register', function(req, res){
 		});
 	}else {
 		console.log('you are good')
-		var newUser = new User(name,email,username,password);
+		var newUser = new User({
+			name: name,
+			email:email,
+			username: username,
+			password: password
+		});
 
-    userHandler.createUser(newUser, function(err, user){
+		User.createUser(newUser, function(err, user){
 			if(err) throw err;
+			// console.log(user);
 		});
 
 		req.flash('success_msg', 'You are registered and can now login');
@@ -59,39 +65,36 @@ router.post('/register', function(req, res){
 	}
 });
 
-// local strategy get username during the req cycle
-// https://github.com/jaredhanson/passport-local
-passport.use(new LocalStrategy({
-    usernameField: 'email',
-  },
-  function(email, password, done) {
-    userHandler.getUserByEmail(email, function(err, user){
-      if(err) throw err;
-     	if(!user){
-     		return done(null, false, {message: 'Unknown email'});
-     	}
 
-     	userHandler.comparePassword(password, user.password, function(err, isMatch){
-     		if(err) throw err;
-     		if(isMatch){
-     			return done(null, user);
-     		} else {
-     			return done(null, false, {message: 'Invalid password'});
-     		}
-     	});
-    });
+passport.use(new LocalStrategy(
+  function(username, password, done) {
+		// following should be modified when we desicard mongodb
+   User.getUserByUsername(username, function(err, user){
+   	if(err) throw err;
+   	if(!user){
+   		return done(null, false, {message: 'Unknown User'});
+   	}
+
+   	User.comparePassword(password, user.password, function(err, isMatch){
+   		if(err) throw err;
+   		if(isMatch){
+   			return done(null, user);
+   		} else {
+   			return done(null, false, {message: 'Invalid password'});
+   		}
+   	});
+   });
   }));
 
 // https://github.com/Automattic/mongoose/issues/548#issuecomment-2245903
 // http://stackoverflow.com/questions/27637609/understanding-passport-serialize-deserialize
-// after user login, passport need to serialize user instance to token
-// store it into the browser cookie for keeping user in login state
 passport.serializeUser(function(user, done) {
-  done(null, user.email);
+	console.log(user.id)
+  done(null, user.id);
 });
 
-passport.deserializeUser(function(email, done) {
-  userHandler.getUserById(email, function(err, user) {
+passport.deserializeUser(function(id, done) {
+  User.getUserById(id, function(err, user) {
     done(err, user);
   });
 });

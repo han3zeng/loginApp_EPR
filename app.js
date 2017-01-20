@@ -11,10 +11,19 @@ var LocalStrategy = require('passport-local').Strategy;
 
 
 // mongodb
-var mongo = require('mongodb');
-var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/loginapp');
-var db = mongoose.connection;
+// var mongo = require('mongodb');
+// var mongoose = require('mongoose');
+// mongoose.connect('mongodb://localhost/loginapp');
+// var db = mongoose.connection;
+
+// Redis
+var redis = require("redis");
+client = redis.createClient();
+
+client.on("error", function (err) {
+    console.log("Error " + err);
+});
+
 
 
 // set up routers
